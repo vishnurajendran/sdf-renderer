@@ -41,11 +41,13 @@ void SDFRenderer::init()
 void SDFRenderer::update(double time)
 {
     if (!isReady) return;
-    auto deltaTime = (time - prevFrameTime) / 1000.0; // convert to ms
+    auto deltaTime = (time - prevFrameTime);
     //start draw call
     glUseProgram(shader.getId());
     pushShaderParams(time);
     draw();
+    prevFrameTime = time;
+    std::cout << "SDFRenderer::Updating SDF Renderer..."<< deltaTime << std::endl;
     //end draw call
 }
 
