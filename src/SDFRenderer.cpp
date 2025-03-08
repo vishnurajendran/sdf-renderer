@@ -47,7 +47,6 @@ void SDFRenderer::update(double time)
     pushShaderParams(time);
     draw();
     prevFrameTime = time;
-    std::cout << "SDFRenderer::Updating SDF Renderer..."<< deltaTime << std::endl;
     //end draw call
 }
 
