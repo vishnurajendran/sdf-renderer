@@ -9,11 +9,6 @@
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
-// Callback function for resizing window
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-
-}
-
 int main() {
     // Initialize GLFW
     if (!glfwInit()) {
