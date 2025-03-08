@@ -2,13 +2,16 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
+#include "SDFRenderer.h"
+#include "shader/Shader.h"
+
 // Window dimensions
 const unsigned int WIDTH = 800;
 const unsigned int HEIGHT = 600;
 
 // Callback function for resizing window
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+
 }
 
 int main() {
@@ -40,18 +43,24 @@ int main() {
 
     // Set OpenGL viewport and callback
     glViewport(0, 0, WIDTH, HEIGHT);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    // create renderer
+    SDFRenderer renderer(WIDTH, HEIGHT, window);
+    renderer.init();
     // Main render loop
     while (!glfwWindowShouldClose(window)) {
         // Clear screen
         glClear(GL_COLOR_BUFFER_BIT);
+
+        //update renderer
+        renderer.update(glfwGetTime());
 
         // Swap buffers and poll events
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
+    renderer.clean();
     // Cleanup and exit
     glfwDestroyWindow(window);
     glfwTerminate();
