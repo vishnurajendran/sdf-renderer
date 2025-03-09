@@ -2,7 +2,7 @@
 #include <GLFW/glfw3.h>
 #include <iostream>
 
-#include "SDFRenderer.h"
+#include "renderer/sdfrenderer.h"
 #include "shader/Shader.h"
 
 // Window dimensions

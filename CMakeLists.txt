@@ -16,14 +16,18 @@ set(SRC_FILES
         src/utils/fileio.h
         src/glutils/gl_utils.cpp
         src/glutils/gl_utils.h
-        src/SDFRenderer.cpp
-        src/SDFRenderer.h
+        src/renderer/SDFRenderer.cpp
+        src/renderer/SDFRenderer.h
         src/shader/data/generic_shader_data.h
         src/shader/data/ray_shader_data.h
         src/shader/data/lighting_shader_data.h
         src/shader/data/ray_shader_data.cpp
         src/shader/data/lighting_shader_data.cpp
         src/shader/data/generic_shader_data.cpp
+        src/renderer/scene/scene_element.cpp
+        src/renderer/scene/scene_element.h
+        src/renderer/scene/Camera.cpp
+        src/renderer/scene/Camera.h
 )
 
 # Include FetchContent for GLFW
