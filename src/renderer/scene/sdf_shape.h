@@ -15,6 +15,13 @@ enum SDFShapeType
     Cylinder=3
 };
 
+enum SDFShapeOperationType
+{
+    Union = 0,
+    Intersection=1,
+    Subtraction=2
+};
+
 class SDFShape : public SceneElement {
 protected:
     SDFShaderDataStruct shaderDataStruct;
@@ -23,6 +30,10 @@ public:
     SDFShaderDataStruct getDataStruct();
     void updateDataToShader(unsigned int shaderId) override;
     void update(double deltaTime) override;
+    inline void SetOperationType(SDFShapeOperationType operationType)
+    {
+        shaderDataStruct.operationType = operationType;
+    };
 };
 
 

@@ -21,6 +21,7 @@ layout(std140) uniform Lighting {
 //alignment is annoying
 struct SDFShapeDataStruct {
     ivec4 type; // only use x (0-> none, 1-> sphere, 2-> box)
+    ivec3 operation; //only use x (0->none, 1->union, 2-> intersection, 3-> subtraction)
     vec4 position; // use only x,y,z
     vec4 radius; // use only x
     vec4 halfExtents; // use x,y,z
@@ -32,7 +33,7 @@ layout(std140) uniform ShapeBlock {
 
 uniform int shapeCount;
 
-// Signed Distance Function for a sphere
+// Signed Distance Function for shapes
 float sdfSphere(vec3 p, vec3 center, float radius) {
     return length(p - center) - radius;
 }
@@ -40,6 +41,19 @@ float sdfSphere(vec3 p, vec3 center, float radius) {
 float sdfBox(vec3 p, vec3 center, vec3 halfExtents) {
     vec3 d = abs(p - center) - halfExtents; // Distance outside the box
     return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Handle inside and outside cases
+}
+
+// Boolean Operations
+float sdfUnion(float d1, float d2) {
+    return min(d1, d2);
+}
+
+float sdfIntersection(float d1, float d2) {
+    return max(d1, d2);
+}
+
+float sdfSubtraction(float d1, float d2) {
+    return max(d1, -d2);
 }
 
 float sdfCylinder(vec3 p, vec3 center, float radius, float halfHeight) {
@@ -50,22 +64,31 @@ float sdfCylinder(vec3 p, vec3 center, float radius, float halfHeight) {
     return max(d.x, d.y); // Ensures the cylinder is properly capped at top and bottom
 }
 float sceneSDF(vec3 p) {
-    float minDist = 1e6;
+    float result = 1e6;
     for (int i = 0; i < shapeCount; i++) {
-        if (shapes[i].type.x == 1.0) { // Sphere
-            float d = sdfSphere(p, shapes[i].position.xyz, shapes[i].radius.x);
-            minDist = min(minDist, d);
+        float d = 1e6;
+        if (shapes[i].type.x == 1) { // Sphere
+            d = sdfSphere(p, shapes[i].position.xyz, shapes[i].radius.x);
         }
-        else if (shapes[i].type.x == 2.0) { // Box
-            float d = sdfBox(p, shapes[i].position.xyz, shapes[i].halfExtents.xyz);
-            minDist = min(minDist, d);
+        else if (shapes[i].type.x == 2) { // Box
+            d = sdfBox(p, shapes[i].position.xyz, shapes[i].halfExtents.xyz);
         }
-        else if (shapes[i].type.x == 3.0){ //Cylinder
-            float d = sdfCylinder(p, shapes[i].position.xyz, shapes[i].radius.x, shapes[i].halfExtents.y);
-            minDist = min(minDist, d);
+        else if (shapes[i].type.x == 3) { // Cylinder
+            d = sdfCylinder(p, shapes[i].position.xyz, shapes[i].radius.x, shapes[i].halfExtents.y);
+        }
+
+        // Apply Boolean operations
+        if (shapes[i].operation.x == 0) {  // Union
+            result = sdfUnion(result, d);
+        }
+        else if (shapes[i].operation.x == 1) {  // Intersection
+            result = sdfIntersection(result, d);
+        }
+        else if (shapes[i].operation.x == 2) {  // Subtraction
+            result = sdfSubtraction(result, d);
         }
     }
-    return minDist;
+    return result;
 }
 
 // Ray Marching function

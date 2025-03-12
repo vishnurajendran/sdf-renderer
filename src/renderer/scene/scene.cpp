@@ -25,7 +25,7 @@ Scene::Scene()
 
     elements.push_back(new SDFSphere(glm::vec3(0,0,0), 0.5));
     elements.push_back(new SDFBox(glm::vec3(1.5,0,0), glm::vec3(0.5f)));
-    elements.push_back(new SDFCylinder(glm::vec3(3,0,0), 0.5f, 0.5f));
+    elements.push_back(new SDFCylinder(glm::vec3(2.25,0,0), 0.5f, 0.5f));
 }
 
 void Scene::initBuffer(unsigned int shaderId)
