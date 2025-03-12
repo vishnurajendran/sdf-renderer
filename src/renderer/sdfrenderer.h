@@ -8,8 +8,9 @@
 #include "shader/data/generic_shader_data.h"
 #include "shader/data/lighting_shader_data.h"
 #include "shader/data/ray_shader_data.h"
-#include "../cmake-build-debug/_deps/glfw-src/include/GLFW/glfw3.h"
-#include "scene/Camera.h"
+#include "GLFW/glfw3.h"
+#include "scene/scene.h"
+
 
 class SDFRenderer {
 private:
@@ -41,8 +42,8 @@ private:
          1.0f,  1.0f
     };
 
-    //Camera
-    Camera camera;
+    //Scene
+    Scene scene;
 
 public:
     SDFRenderer(int width, int height, GLFWwindow* window);

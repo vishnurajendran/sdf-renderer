@@ -28,6 +28,18 @@ set(SRC_FILES
         src/renderer/scene/scene_element.h
         src/renderer/scene/Camera.cpp
         src/renderer/scene/Camera.h
+        src/renderer/scene/sdf_shape.cpp
+        src/renderer/scene/sdf_shape.h
+        src/renderer/scene/data/SDFShaderDataStruct.cpp
+        src/renderer/scene/data/SDFShaderDataStruct.h
+        src/renderer/scene/sdf_sphere.cpp
+        src/renderer/scene/sdf_sphere.h
+        src/renderer/scene/Scene.cpp
+        src/renderer/scene/Scene.h
+        src/renderer/scene/sdf_box.cpp
+        src/renderer/scene/sdf_box.h
+        src/renderer/scene/sdf_cylinder.cpp
+        src/renderer/scene/sdf_cylinder.h
 )
 
 # Include FetchContent for GLFW

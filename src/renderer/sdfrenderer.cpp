@@ -7,6 +7,7 @@
 #include <ostream>
 #include <../cmake-build-debug/_deps/glm-src/glm/glm.hpp>
 #include "glutils/gl_utils.h"
+#include "scene/sdf_shape.h"
 
 bool SDFRenderer::firstMouse = true;
 float SDFRenderer::lastX = 0.0f;
@@ -41,11 +42,7 @@ void SDFRenderer::init()
     glEnableVertexAttribArray(0);
 
     setupShaderUniformBuffers();
-
-    camera.position = glm::vec3(0,0,5);
-    camera.rotation = glm::vec3(0,0,0);
-
-    lightingShaderData.ambient = glm::vec3(0.1f, 0.1f, 0.1f);
+    lightingShaderData.ambient = glm::vec3(0.6f);
     lightingShaderData.sunDirection = glm::vec3(1,1,-1);
     lightingShaderData.sunColor = glm::vec3(1,1, 1);
 
@@ -61,8 +58,7 @@ void SDFRenderer::update(double time)
     processInput();
 
     // update scene-elements
-    camera.update(deltaTime);
-
+    scene.update(deltaTime);
 
     //start draw call
     glUseProgram(shader.getId());
@@ -89,8 +85,8 @@ void SDFRenderer::mouseCallback(GLFWwindow* window, double xpos, double ypos) {
     float sensitivity = 0.002f;
     xOffset *= sensitivity;
     yOffset *= sensitivity;
-    instance->camera.rotation.x += xOffset; // Yaw (horizontal rotation)
-    instance->camera.rotation.y = glm::clamp(instance->camera.rotation.y + yOffset, -1.5f, 1.5f); // Pitch (vertical rotation)
+    instance->scene.getCamera()->rotation.x += xOffset; // Yaw (horizontal rotation)
+    instance->scene.getCamera()->rotation.y = glm::clamp(instance->scene.getCamera()->rotation.y + yOffset, -1.5f, 1.5f); // Pitch (vertical rotation)
 }
 
 void SDFRenderer::processInput()
@@ -98,17 +94,17 @@ void SDFRenderer::processInput()
     float cameraSpeed = 2.5f * deltaTime;
 
     if (glfwGetKey(windowCtx, GLFW_KEY_W) == GLFW_PRESS)
-        camera.position += camera.forward * cameraSpeed;
+        scene.getCamera()->position += scene.getCamera()->forward * cameraSpeed;
     if (glfwGetKey(windowCtx, GLFW_KEY_S) == GLFW_PRESS)
-        camera.position -= camera.forward * cameraSpeed;
+        scene.getCamera()->position -= scene.getCamera()->forward * cameraSpeed;
     if (glfwGetKey(windowCtx, GLFW_KEY_A) == GLFW_PRESS)
-        camera.position -= cameraSpeed * camera.right;
+        scene.getCamera()->position -= cameraSpeed * scene.getCamera()->right;
     if (glfwGetKey(windowCtx, GLFW_KEY_D) == GLFW_PRESS)
-        camera.position += cameraSpeed * camera.right;
+        scene.getCamera()->position += cameraSpeed * scene.getCamera()->right;
     if (glfwGetKey(windowCtx, GLFW_KEY_SPACE) == GLFW_PRESS)
-        camera.position.y += cameraSpeed;
+        scene.getCamera()->position.y += cameraSpeed;
     if (glfwGetKey(windowCtx, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
-        camera.position.y -= cameraSpeed;
+        scene.getCamera()->position.y -= cameraSpeed;
 }
 
 void SDFRenderer::clean()
@@ -135,12 +131,14 @@ void SDFRenderer::pushShaderParams(double time)
 {
     genericShaderData.time = time;
 
-    rayShaderData.origin = camera.position;
-    rayShaderData.direction = camera.forward;
+    rayShaderData.origin = scene.getCamera()->position;
+    rayShaderData.direction = scene.getCamera()->forward;
 
     genericShaderData.pushToShader();
     lightingShaderData.pushToShader();
     rayShaderData.pushToShader();
+
+    scene.pushSceneElementsToShader(shader.getId());
 }
 
 void SDFRenderer::setupShaderUniformBuffers()

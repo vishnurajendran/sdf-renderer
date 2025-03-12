@@ -18,33 +18,76 @@ layout(std140) uniform Lighting {
     vec3 sunColor;
 }lighting;
 
+//alignment is annoying
+struct SDFShapeDataStruct {
+    ivec4 type; // only use x (0-> none, 1-> sphere, 2-> box)
+    vec4 position; // use only x,y,z
+    vec4 radius; // use only x
+    vec4 halfExtents; // use x,y,z
+};
+
+layout(std140) uniform ShapeBlock {
+    SDFShapeDataStruct shapes[10];
+};
+
+uniform int shapeCount;
 
 // Signed Distance Function for a sphere
-float sdfSphere(vec3 centre, float radius) {
-    return length(centre) - radius;
+float sdfSphere(vec3 p, vec3 center, float radius) {
+    return length(p - center) - radius;
 }
 
-// Estimate normals using gradient approximation
-vec3 estimateNormal(vec3 point) {
-    float h = 0.001;
-    return normalize(vec3(
-    sdfSphere(point + vec3(h, 0, 0), 0.5) - sdfSphere(point - vec3(h, 0, 0), 0.5),
-    sdfSphere(point + vec3(0, h, 0), 0.5) - sdfSphere(point - vec3(0, h, 0), 0.5),
-    sdfSphere(point + vec3(0, 0, h), 0.5) - sdfSphere(point - vec3(0, 0, h), 0.5)
-    ));
+float sdfBox(vec3 p, vec3 center, vec3 halfExtents) {
+    vec3 d = abs(p - center) - halfExtents; // Distance outside the box
+    return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Handle inside and outside cases
+}
+
+float sdfCylinder(vec3 p, vec3 center, float radius, float halfHeight) {
+    vec2 d = vec2(
+    length(p.xz - center.xz) - radius,  // Radial distance
+    abs(p.y - center.y) - halfHeight    // Vertical distance from the center
+    );
+    return max(d.x, d.y); // Ensures the cylinder is properly capped at top and bottom
+}
+float sceneSDF(vec3 p) {
+    float minDist = 1e6;
+    for (int i = 0; i < shapeCount; i++) {
+        if (shapes[i].type.x == 1.0) { // Sphere
+            float d = sdfSphere(p, shapes[i].position.xyz, shapes[i].radius.x);
+            minDist = min(minDist, d);
+        }
+        else if (shapes[i].type.x == 2.0) { // Box
+            float d = sdfBox(p, shapes[i].position.xyz, shapes[i].halfExtents.xyz);
+            minDist = min(minDist, d);
+        }
+        else if (shapes[i].type.x == 3.0){ //Cylinder
+            float d = sdfCylinder(p, shapes[i].position.xyz, shapes[i].radius.x, shapes[i].halfExtents.y);
+            minDist = min(minDist, d);
+        }
+    }
+    return minDist;
 }
 
 // Ray Marching function
-float rayMarch(vec3 origin, vec3 direction, out vec3 hitPos) {
+float rayMarch(vec3 origin, vec3 direction,int steps, out vec3 hitPos) {
     float t = 0.0;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < steps; i++) {
         hitPos = origin + t * direction;
-        float d = sdfSphere(hitPos, 0.5);
+        float d = sceneSDF(hitPos);
         if (d < 0.001) return t;
         t += d;
-        if (t > 10.0) break;
+        if (t > steps) break;
     }
     return -1.0;
+}
+
+vec3 estimateNormal(vec3 p) {
+    float h = 0.0001;
+    return normalize(vec3(
+    sceneSDF(p + vec3(h, 0, 0)) - sceneSDF(p - vec3(h, 0, 0)),
+    sceneSDF(p + vec3(0, h, 0)) - sceneSDF(p - vec3(0, h, 0)),
+    sceneSDF(p + vec3(0, 0, h)) - sceneSDF(p - vec3(0, 0, h))
+    ));
 }
 
 void main() {
@@ -53,18 +96,16 @@ void main() {
     vec3 rayDirection = normalize(ray.direction + vec3(uv, -1));
 
     vec3 hitPos;
-    float t = rayMarch(rayOrigin, rayDirection, hitPos);
+    float t = rayMarch(rayOrigin, rayDirection,100, hitPos);
     vec3 ambient = lighting.ambientColor;
 
     if (t > 0.0) {
-
         vec3 normal = estimateNormal(hitPos);
-        vec3 sunDir = lighting.sunDirection;
+        vec3 sunDir = normalize(lighting.sunDirection);
         float sunContrib = max(dot(normal, sunDir), 0.0);
         vec3 diffuse = sunContrib * lighting.sunColor;
         FragColor = vec4(vec3(diffuse + ambient), 1.0);
-
     } else {
-        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        FragColor = vec4(vec3(0.155, 0.312, 0.682), 1.0);
     }
 }
