@@ -4,6 +4,7 @@
 
 #include "sdf_sphere.h"
 
+#include <imgui.h>
 #include <iostream>
 
 SDFShapeType SDFSphere::getType()
@@ -25,4 +26,12 @@ void SDFSphere::update(double deltaTime)
 void SDFSphere::updateDataToShader(unsigned int shaderId)
 {
     SDFShape::updateDataToShader(shaderId);
+}
+
+void SDFSphere::drawInspectorGui()
+{
+    SDFShape::drawInspectorGui();
+    ImGui::Text("Radius: ");
+    ImGui::SameLine();
+    ImGui::InputFloat("##SPHERE_RAD",&shaderDataStruct.radius,0.1f,1.0f);
 }

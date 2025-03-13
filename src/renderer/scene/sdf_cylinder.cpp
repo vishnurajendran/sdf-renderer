@@ -4,6 +4,10 @@
 
 #include "sdf_cylinder.h"
 
+#include <imgui.h>
+
+#include "glm/gtc/type_ptr.hpp"
+
 SDFShapeType SDFCylinder::getType()
 {
     return SDFShapeType::Cylinder;
@@ -24,4 +28,15 @@ void SDFCylinder::update(double deltaTime)
 void SDFCylinder::updateDataToShader(unsigned int shaderId)
 {
     SDFShape::updateDataToShader(shaderId);
+}
+
+void SDFCylinder::drawInspectorGui()
+{
+    SDFShape::drawInspectorGui();
+    ImGui::Text("Radius");
+    ImGui::SameLine();
+    ImGui::InputFloat("##CYL_RAD", &shaderDataStruct.radius);
+    ImGui::Text("Height");
+    ImGui::SameLine();
+    ImGui::InputFloat("##CYL_HEIGHT", &shaderDataStruct.halfExtents.y);
 }

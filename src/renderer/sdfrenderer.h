@@ -10,6 +10,7 @@
 #include "shader/data/ray_shader_data.h"
 #include "GLFW/glfw3.h"
 #include "scene/scene.h"
+#include "ui/scene_ui.h"
 
 
 class SDFRenderer {
@@ -44,17 +45,19 @@ private:
 
     //Scene
     Scene scene;
+    SceneUI sceneUI;
 
 public:
     SDFRenderer(int width, int height, GLFWwindow* window);
     void init();
     void update(double time);
     void processInput();
-    static void clean();
+    void clean();
 private:
-    void draw() const;
+    void draw();
     void pushShaderParams(double time);
     void setupShaderUniformBuffers();
+    void setupImGUI();
     static void updateResolution(GLFWwindow* window, int width, int height);
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 };

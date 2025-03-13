@@ -32,6 +32,7 @@ layout(std140) uniform ShapeBlock {
 };
 
 uniform int shapeCount;
+uniform float cameraFarClip=100;
 
 // Signed Distance Function for shapes
 float sdfSphere(vec3 p, vec3 center, float radius) {
@@ -97,9 +98,9 @@ float rayMarch(vec3 origin, vec3 direction,int steps, out vec3 hitPos) {
     for (int i = 0; i < steps; i++) {
         hitPos = origin + t * direction;
         float d = sceneSDF(hitPos);
-        if (d < 0.001) return t;
+        if (d < 0.001f) return t;
         t += d;
-        if (t > steps) break;
+        if (t > cameraFarClip) break;
     }
     return -1.0;
 }
@@ -129,6 +130,6 @@ void main() {
         vec3 diffuse = sunContrib * lighting.sunColor;
         FragColor = vec4(vec3(diffuse + ambient), 1.0);
     } else {
-        FragColor = vec4(vec3(0.155, 0.312, 0.682), 1.0);
+        FragColor = vec4(vec3(0.105, 0.212, 0.482), 1.0);
     }
 }

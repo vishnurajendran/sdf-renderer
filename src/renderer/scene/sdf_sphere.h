@@ -13,8 +13,10 @@ protected:
 public:
     SDFSphere(glm::vec3 position, float radius);
     ~SDFSphere()=default;
+    std::string getName() override { return "Sphere"; }
     void update(double deltaTime) override;
     void updateDataToShader(unsigned int shaderId) override;
+    void drawInspectorGui() override;
 };
 
 

@@ -4,6 +4,10 @@
 
 #include "sdf_box.h"
 
+#include <imgui.h>
+
+#include "glm/gtc/type_ptr.hpp"
+
 SDFShapeType SDFBox::getType()
 {
     return SDFShapeType::Box;
@@ -23,4 +27,12 @@ void SDFBox::update(double deltaTime)
 void SDFBox::updateDataToShader(unsigned int shaderId)
 {
     SDFShape::updateDataToShader(shaderId);
+}
+
+void SDFBox::drawInspectorGui()
+{
+    SDFShape::drawInspectorGui();
+    ImGui::Text("Half Extents");
+    ImGui::SameLine();
+    ImGui::InputFloat3("##HALF_EXT", glm::value_ptr(shaderDataStruct.halfExtents));
 }

@@ -3,6 +3,10 @@
 //
 
 #include "sdfrenderer.h"
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 #include <iostream>
 #include <ostream>
 #include <../cmake-build-debug/_deps/glm-src/glm/glm.hpp>
@@ -20,6 +24,9 @@ SDFRenderer::SDFRenderer(int width, int height, GLFWwindow* window)
     glfwSetWindowUserPointer(window, this);
     glfwSetFramebufferSizeCallback(window, updateResolution);
     glfwSetCursorPosCallback(window, mouseCallback);
+
+    setupImGUI();
+    sceneUI.init(&scene);
 }
 
 void SDFRenderer::init()
@@ -109,6 +116,9 @@ void SDFRenderer::processInput()
 
 void SDFRenderer::clean()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     std::cout << "SDFRenderer::Cleaning SDFRenderer" << std::endl;
 }
 
@@ -120,10 +130,18 @@ void SDFRenderer::updateResolution(GLFWwindow* window, int width, int height)
     std::cout << "SDFRenderer::Updating Resolution..."<< width << "X"<< height << std::endl;
 }
 
-void SDFRenderer::draw() const
+void SDFRenderer::draw()
 {
     glBindVertexArray(VAO);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    sceneUI.draw();
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
     CheckOpenGLError();
 }
 
@@ -138,7 +156,7 @@ void SDFRenderer::pushShaderParams(double time)
     lightingShaderData.pushToShader();
     rayShaderData.pushToShader();
 
-    scene.pushSceneElementsToShader(shader.getId());
+    scene.pushToShader(shader.getId());
 }
 
 void SDFRenderer::setupShaderUniformBuffers()
@@ -146,4 +164,14 @@ void SDFRenderer::setupShaderUniformBuffers()
     genericShaderData.init(shader.getId());
     lightingShaderData.init(shader.getId());
     rayShaderData.init(shader.getId());
+}
+
+void SDFRenderer::setupImGUI()
+{
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.BackendFlags = ImGuiBackendFlags_HasMouseCursors | ImGuiBackendFlags_HasSetMousePos;
+    // Setup ImGui with GLFW and OpenGL3
+    ImGui_ImplGlfw_InitForOpenGL(windowCtx, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 }

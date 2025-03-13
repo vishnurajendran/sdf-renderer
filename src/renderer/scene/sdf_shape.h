@@ -34,6 +34,7 @@ public:
     {
         shaderDataStruct.operationType = operationType;
     };
+    virtual void drawInspectorGui() override;
 };
 
 

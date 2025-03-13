@@ -12,8 +12,10 @@ protected:
 public:
     SDFCylinder(glm::vec3 position, float halfHeight, float radius);
     ~SDFCylinder()=default;
+    std::string getName() override { return "Cylinder"; }
     void update(double deltaTime) override;
     void updateDataToShader(unsigned int shaderId) override;
+    void drawInspectorGui() override;
 };
 
 

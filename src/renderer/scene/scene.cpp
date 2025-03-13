@@ -22,10 +22,6 @@ Scene::Scene()
     elements.push_back(cameraRef);
     cameraRef->position = glm::vec3(0,0,10);
     cameraRef->rotation = glm::vec3(0,0,0);
-
-    elements.push_back(new SDFSphere(glm::vec3(0,0,0), 0.5));
-    elements.push_back(new SDFBox(glm::vec3(1.5,0,0), glm::vec3(0.5f)));
-    elements.push_back(new SDFCylinder(glm::vec3(2.25,0,0), 0.5f, 0.5f));
 }
 
 void Scene::initBuffer(unsigned int shaderId)
@@ -41,7 +37,7 @@ void Scene::initBuffer(unsigned int shaderId)
 }
 
 
-void Scene::pushSceneElementsToShader(unsigned int shaderId)
+void Scene::pushToShader(unsigned int shaderId)
 {
     if (firstTime)
     {
@@ -52,6 +48,7 @@ void Scene::pushSceneElementsToShader(unsigned int shaderId)
     std::vector<SDFShaderDataStruct> shapesData;
     for (auto& element : elements)
     {
+        element->updateDataToShader(shaderId);
         auto shape = dynamic_cast<SDFShape*>(element);
         if (shape == nullptr)
             continue;
@@ -82,4 +79,29 @@ void Scene::update(double deltaTime)
     {
         element->update(deltaTime);
     }
+}
+
+void Scene::addShape(SDFShapeType shapeType)
+{
+    switch (shapeType)
+    {
+    case SDFShapeType::Sphere:
+        elements.push_back(new SDFSphere(glm::vec3(0.0f), 0.5f));
+        break;
+    case SDFShapeType::Box:
+        elements.push_back(new SDFBox(glm::vec3(0.0f), glm::vec3(0.5f)));
+        break;
+    case SDFShapeType::Cylinder:
+        elements.push_back(new SDFCylinder(glm::vec3(0.0f), 0.5f, 0.5f));
+        break;
+    default:
+        break;
+    }
+}
+
+void Scene::removeSceneElement(const SceneElement* element)
+{
+    auto it = std::find(elements.begin(), elements.end(), element);
+    if (it != elements.end())
+        elements.erase(std::remove(elements.begin(), elements.end(), element), elements.end());
 }

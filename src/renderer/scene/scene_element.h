@@ -4,12 +4,16 @@
 
 #ifndef SCENE_ELEMENT_H
 #define SCENE_ELEMENT_H
+#include <string>
+
 #include "glm/glm.hpp"
 
 
 class SceneElement {
 public:
     virtual ~SceneElement() = default;
+    virtual std::string getName() = 0;
+    virtual void drawInspectorGui() = 0;
     virtual void updateDataToShader(unsigned int shaderId)=0;
     virtual void update(double deltaTime);
 public:

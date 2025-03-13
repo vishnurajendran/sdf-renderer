@@ -5,6 +5,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 #include "Camera.h"
+#include "sdf_shape.h"
 
 class Scene
 {
@@ -19,11 +20,15 @@ private:
 public:
     Scene();
     inline Camera* getCamera() { return cameraRef; }
-    void pushSceneElementsToShader(unsigned int shaderId);
+    inline std::vector<SceneElement*> getElements() { return elements; }
+    void pushToShader(unsigned int shaderId);
     void update(double deltaTime);
+    void addShape(SDFShapeType shapeType);
+    void removeSceneElement(const SceneElement* element);
 private:
     void initBuffer(unsigned int shaderId);
 };
+
 
 
 

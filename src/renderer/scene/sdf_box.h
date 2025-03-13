@@ -12,8 +12,10 @@ protected:
 public:
     SDFBox(glm::vec3 position, glm::vec3 halfExtents);
     ~SDFBox()=default;
+    std::string getName() override { return "Box"; }
     void update(double deltaTime) override;
     void updateDataToShader(unsigned int shaderId) override;
+    void drawInspectorGui() override;
 };
 
 #endif //SDFBOX_H
