@@ -8,7 +8,9 @@
 struct RayShaderData
 {
     alignas(16) glm::vec3 origin;
-    alignas(16) glm::vec3 direction;
+    alignas(16) glm::vec3 forward;
+    alignas(16) glm::vec3 right;
+    alignas(16) glm::vec3 up;
 
     unsigned int bufferIndx;
     unsigned int bufferObject;

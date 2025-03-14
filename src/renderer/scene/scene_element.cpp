@@ -6,12 +6,13 @@
 
 void SceneElement::update(double deltaTime)
 {
-    forward = normalize(glm::vec3(
-        cos(rotation.y) * sin(rotation.x),  // X component (Yaw applied)
-        sin(rotation.y),                    // Y component (Pitch applied)
-    -cos(rotation.y) * cos(rotation.x)   // Z component (Yaw & Pitch applied)
+    glm::vec3 rotationRad = glm::radians(rotation);
+    forward = glm::normalize(glm::vec3(
+        -cos(rotationRad.x) * sin(rotationRad.y),
+        sin(rotationRad.x),
+        -cos(rotationRad.x) * cos(rotationRad.y)
     ));
 
-    right = normalize(cross(forward, glm::vec3(0.0f, 1.0f, 0.0f))); // Perpendicular to forward & world-up
-    up = normalize(cross(right, forward)); // Perpendicular to forward & right
+    right = glm::normalize(glm::cross(forward, glm::vec3(0.0f, 1.0f, 0.0f)));
+    up = glm::normalize(glm::cross(right, forward));
 }

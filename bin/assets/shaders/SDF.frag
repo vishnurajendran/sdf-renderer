@@ -9,7 +9,9 @@ layout(std140) uniform Generic{
 
 layout(std140) uniform Ray{
     vec3 position;
-    vec3 direction;
+    vec3 forward;
+    vec3 right;
+    vec3 up;
 }ray;
 
 layout(std140) uniform Lighting {
@@ -23,6 +25,7 @@ struct SDFShapeDataStruct {
     ivec4 type; // only use x (0-> none, 1-> sphere, 2-> box)
     ivec3 operation; //only use x (0->none, 1->union, 2-> intersection, 3-> subtraction)
     vec4 position; // use only x,y,z
+    vec4 rotation; // use only x,y,z
     vec4 radius; // use only x
     vec4 halfExtents; // use x,y,z
 };
@@ -34,14 +37,42 @@ layout(std140) uniform ShapeBlock {
 uniform int shapeCount;
 uniform float cameraFarClip=100;
 
+mat2 rotate2D(float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return mat2(c, -s, s, c);
+}
+
 // Signed Distance Function for shapes
 float sdfSphere(vec3 p, vec3 center, float radius) {
     return length(p - center) - radius;
 }
 
-float sdfBox(vec3 p, vec3 center, vec3 halfExtents) {
-    vec3 d = abs(p - center) - halfExtents; // Distance outside the box
-    return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0)); // Handle inside and outside cases
+float sdfBox(vec3 p, vec3 center, vec3 halfExtents, vec3 rotationDegrees) {
+    vec3 q = p - center; // Translate to origin
+    vec3 rotation = radians(rotationDegrees); // Convert to radians
+
+    q.xz = rotate2D(rotation.y) * q.xz;  // Rotate around Y-axis
+    q.yz = rotate2D(rotation.x) * q.yz;  // Rotate around X-axis
+    q.xy = rotate2D(rotation.z) * q.xy;  // Rotate around Z-axis
+
+    vec3 d = abs(q) - halfExtents;
+    return min(max(d.x, max(d.y, d.z)), 0.0) + length(max(d, 0.0));
+}
+
+float sdfCylinder(vec3 p, vec3 center, float radius, float halfHeight, vec3 rotationDegrees) {
+    vec3 q = p - center;
+    vec3 rotation = radians(rotationDegrees);
+
+    q.xz = rotate2D(rotation.y) * q.xz;  // Rotate around Y-axis
+    q.yz = rotate2D(rotation.x) * q.yz;  // Rotate around X-axis
+    q.xy = rotate2D(rotation.z) * q.xy;  // Rotate around Z-axis
+
+    vec2 d = vec2(
+    length(q.xz) - radius,  // Radial distance
+    abs(q.y) - halfHeight   // Height limit
+    );
+    return max(d.x, d.y); // Keeps both height and radial limit
 }
 
 // Boolean Operations
@@ -57,25 +88,19 @@ float sdfSubtraction(float d1, float d2) {
     return max(d1, -d2);
 }
 
-float sdfCylinder(vec3 p, vec3 center, float radius, float halfHeight) {
-    vec2 d = vec2(
-    length(p.xz - center.xz) - radius,  // Radial distance
-    abs(p.y - center.y) - halfHeight    // Vertical distance from the center
-    );
-    return max(d.x, d.y); // Ensures the cylinder is properly capped at top and bottom
-}
 float sceneSDF(vec3 p) {
     float result = 1e6;
     for (int i = 0; i < shapeCount; i++) {
         float d = 1e6;
+        vec3 rotation = shapes[i].rotation.xyz;
         if (shapes[i].type.x == 1) { // Sphere
             d = sdfSphere(p, shapes[i].position.xyz, shapes[i].radius.x);
         }
         else if (shapes[i].type.x == 2) { // Box
-            d = sdfBox(p, shapes[i].position.xyz, shapes[i].halfExtents.xyz);
+            d = sdfBox(p, shapes[i].position.xyz, shapes[i].halfExtents.xyz,rotation);
         }
         else if (shapes[i].type.x == 3) { // Cylinder
-            d = sdfCylinder(p, shapes[i].position.xyz, shapes[i].radius.x, shapes[i].halfExtents.y);
+            d = sdfCylinder(p, shapes[i].position.xyz, shapes[i].radius.x, shapes[i].halfExtents.y,rotation);
         }
 
         // Apply Boolean operations
@@ -116,8 +141,15 @@ vec3 estimateNormal(vec3 p) {
 
 void main() {
     vec2 uv = (gl_FragCoord.xy - 0.5 * generic.resolution) / generic.resolution.y;
+
     vec3 rayOrigin = ray.position;
-    vec3 rayDirection = normalize(ray.direction + vec3(uv, -1));
+
+    // compute world space properly to keep correct aspect.
+    // this was a pain to figure out
+    vec3 forward = normalize(ray.forward);
+    vec3 right = normalize(ray.right);
+    vec3 up = normalize(ray.up);
+    vec3 rayDirection = normalize(forward + uv.x * right + uv.y * up); // Apply correct deviation
 
     vec3 hitPos;
     float t = rayMarch(rayOrigin, rayDirection,100, hitPos);
@@ -130,6 +162,6 @@ void main() {
         vec3 diffuse = sunContrib * lighting.sunColor;
         FragColor = vec4(vec3(diffuse + ambient), 1.0);
     } else {
-        FragColor = vec4(vec3(0.105, 0.212, 0.482), 1.0);
+        FragColor = vec4(vec3(0.15, 0.15, 0.15), 1.0);
     }
 }

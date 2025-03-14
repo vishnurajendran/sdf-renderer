@@ -3,13 +3,12 @@
 //
 
 #include "sdfrenderer.h"
-
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <iostream>
 #include <ostream>
-#include <../cmake-build-debug/_deps/glm-src/glm/glm.hpp>
+#include <glm/glm.hpp>
 #include "glutils/gl_utils.h"
 #include "scene/sdf_shape.h"
 
@@ -77,23 +76,28 @@ void SDFRenderer::update(double time)
 
 void SDFRenderer::mouseCallback(GLFWwindow* window, double xpos, double ypos) {
 
-    return;
     auto instance = static_cast<SDFRenderer*>(glfwGetWindowUserPointer(window));
+    if (!instance->getLookInput())
+        return;
 
+    static float lastX = xpos;
+    static float lastY = ypos;
     if (firstMouse) {
         lastX = xpos;
         lastY = ypos;
         firstMouse = false;
     }
     float xOffset = xpos - lastX;
-    float yOffset = lastY - ypos;
+    float yOffset = ypos - lastY;
     lastX = xpos;
     lastY = ypos;
-    float sensitivity = 0.002f;
+
+    float sensitivity = 15.0f * instance->getDeltaTime();
     xOffset *= sensitivity;
     yOffset *= sensitivity;
-    instance->scene.getCamera()->rotation.x += xOffset; // Yaw (horizontal rotation)
-    instance->scene.getCamera()->rotation.y = glm::clamp(instance->scene.getCamera()->rotation.y + yOffset, -1.5f, 1.5f); // Pitch (vertical rotation)
+
+    instance->scene.getCamera()->rotation.y -= xOffset;
+    instance->scene.getCamera()->rotation.x -= yOffset;
 }
 
 void SDFRenderer::processInput()
@@ -112,6 +116,14 @@ void SDFRenderer::processInput()
         scene.getCamera()->position.y += cameraSpeed;
     if (glfwGetKey(windowCtx, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
         scene.getCamera()->position.y -= cameraSpeed;
+
+    if (glfwGetMouseButton(windowCtx, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS)
+        isLookInputActive = true;
+    else
+    {
+        firstMouse = true;
+        isLookInputActive = false;
+    }
 }
 
 void SDFRenderer::clean()
@@ -150,7 +162,9 @@ void SDFRenderer::pushShaderParams(double time)
     genericShaderData.time = time;
 
     rayShaderData.origin = scene.getCamera()->position;
-    rayShaderData.direction = scene.getCamera()->forward;
+    rayShaderData.forward = scene.getCamera()->forward;
+    rayShaderData.right = scene.getCamera()->right;
+    rayShaderData.up = scene.getCamera()->up;
 
     genericShaderData.pushToShader();
     lightingShaderData.pushToShader();

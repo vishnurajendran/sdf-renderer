@@ -9,6 +9,7 @@
 SDFShaderDataStruct SDFShape::getDataStruct()
 {
     shaderDataStruct.position = position;
+    shaderDataStruct.rotation = rotation;
     shaderDataStruct.shapeType = getType();
     return shaderDataStruct;
 }

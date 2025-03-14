@@ -81,7 +81,6 @@ void SceneUI::drawShapeDetails()
     if (ImGui::CollapsingHeader("Details"))
     {
         ImGui::Text("Position");
-
         ImGui::Text("X:");
         ImGui::SameLine();
         ImGui::SetNextItemWidth(50);
@@ -96,6 +95,23 @@ void SceneUI::drawShapeDetails()
         ImGui::SameLine();
         ImGui::SetNextItemWidth(50);
         ImGui::DragFloat("##LocZ", &selected->position.z, 0.01f);
+        ImGui::NewLine();
+
+        ImGui::Text("Rotation");
+        ImGui::Text("X:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50);
+        ImGui::DragFloat("##RotX", &selected->rotation.x, 0.01f);
+        ImGui::SameLine();
+        ImGui::Text("Y:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50);
+        ImGui::DragFloat("##RotY", &selected->rotation.y,0.01f);
+        ImGui::SameLine();
+        ImGui::Text("Z:");
+        ImGui::SameLine();
+        ImGui::SetNextItemWidth(50);
+        ImGui::DragFloat("##RotZ", &selected->rotation.z, 0.01f);
         ImGui::NewLine();
 
         selected->drawInspectorGui();

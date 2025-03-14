@@ -47,6 +47,9 @@ private:
     Scene scene;
     SceneUI sceneUI;
 
+    //Camera controls
+    bool isLookInputActive;
+
 public:
     SDFRenderer(int width, int height, GLFWwindow* window);
     void init();
@@ -58,6 +61,8 @@ private:
     void pushShaderParams(double time);
     void setupShaderUniformBuffers();
     void setupImGUI();
+    [[nodiscard]] bool getLookInput() const { return isLookInputActive; }
+    [[nodiscard]] double getDeltaTime() const {return deltaTime;}
     static void updateResolution(GLFWwindow* window, int width, int height);
     static void mouseCallback(GLFWwindow* window, double xpos, double ypos);
 };
