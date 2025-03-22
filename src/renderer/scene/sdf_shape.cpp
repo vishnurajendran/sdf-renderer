@@ -6,6 +6,8 @@
 
 #include <imgui.h>
 
+#include "glm/gtc/type_ptr.hpp"
+
 SDFShaderDataStruct SDFShape::getDataStruct()
 {
     shaderDataStruct.position = position;
@@ -35,4 +37,6 @@ void SDFShape::drawInspectorGui()
     {
         shaderDataStruct.operationType = currValue;
     }
+    ImGui::NewLine();
+    ImGui::ColorPicker3("Surface Color", glm::value_ptr(shaderDataStruct.surfaceColor), ImGuiColorEditFlags_Float);
 }

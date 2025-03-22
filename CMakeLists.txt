@@ -71,9 +71,19 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(imgui)
 
+FetchContent_Declare(
+        stb
+        GIT_REPOSITORY https://github.com/nothings/stb.git
+        GIT_TAG        master  # You can pin to a commit/tag
+)
+FetchContent_MakeAvailable(stb)
+
 # Create GLAD Library
 add_library(glad ${PROJECT_SOURCE_DIR}/vendor/glad/src/glad.c)
 target_include_directories(glad PUBLIC ${GLAD_HEADER_DIR})
+
+add_library(stb INTERFACE)
+target_include_directories(stb INTERFACE ${stb_SOURCE_DIR})
 
 # Set binary output directory
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -96,4 +106,4 @@ target_include_directories(sdf_renderer PRIVATE
 )
 
 # Link Libraries
-target_link_libraries(sdf_renderer PRIVATE glad glfw glm)
+target_link_libraries(sdf_renderer PRIVATE glad glfw glm stb)

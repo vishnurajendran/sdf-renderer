@@ -10,6 +10,7 @@ struct alignas(16) SDFShaderDataStruct {
     //basic
     alignas(16) int shapeType=0;
     alignas(16) int operationType=0;
+    alignas(16) glm::vec3 surfaceColor;
     alignas(16) glm::vec3 position;
     alignas(16) glm::vec3 rotation;
     //shape specifics

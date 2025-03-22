@@ -42,7 +42,6 @@ private:
          1.0f, -1.0f,
          1.0f,  1.0f
     };
-
     //Scene
     Scene scene;
     SceneUI sceneUI;

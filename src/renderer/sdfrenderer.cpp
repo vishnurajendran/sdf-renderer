@@ -2,6 +2,9 @@
 // Created by ssj5v on 06-03-2025.
 //
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 #include "sdfrenderer.h"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>

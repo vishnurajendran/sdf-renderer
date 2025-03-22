@@ -2,7 +2,7 @@
 // Created by ssj5v on 08-03-2025.
 //
 
-#include "Camera.h"
+#include "camera.h"
 
 #include <imgui.h>
 #include <glad/glad.h>

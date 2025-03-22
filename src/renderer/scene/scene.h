@@ -4,7 +4,7 @@
 
 #ifndef SCENE_H
 #define SCENE_H
-#include "Camera.h"
+#include "camera.h"
 #include "sdf_shape.h"
 
 class Scene
