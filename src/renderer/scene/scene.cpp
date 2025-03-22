@@ -20,8 +20,8 @@ Scene::Scene()
     sceneBufferObject = 0;
     cameraRef = new Camera();
     elements.push_back(cameraRef);
-    cameraRef->position = glm::vec3(0,0,10);
-    cameraRef->rotation = glm::vec3(0,0,0);
+    cameraRef->position = glm::vec3(2.5f,1.2f,2.0f);
+    cameraRef->rotation = glm::vec3(-19.0f,55.0f,0);
 }
 
 void Scene::initBuffer(unsigned int shaderId)
@@ -87,21 +87,29 @@ void Scene::addShape(SDFShapeType shapeType)
     {
     case SDFShapeType::Sphere:
         elements.push_back(new SDFSphere(glm::vec3(0.0f), 0.5f));
+        shapesInScene += 1;
         break;
     case SDFShapeType::Box:
         elements.push_back(new SDFBox(glm::vec3(0.0f), glm::vec3(0.5f)));
+        shapesInScene += 1;
         break;
     case SDFShapeType::Cylinder:
         elements.push_back(new SDFCylinder(glm::vec3(0.0f), 0.5f, 0.5f));
+        shapesInScene += 1;
         break;
     default:
         break;
     }
 }
 
-void Scene::removeSceneElement(const SceneElement* element)
+void Scene::removeSceneElement(SceneElement* element)
 {
     auto it = std::find(elements.begin(), elements.end(), element);
     if (it != elements.end())
+    {
+        auto shape = dynamic_cast<SDFShape*>(element);
+        if (shape != nullptr)
+            shapesInScene -= 1;
         elements.erase(std::remove(elements.begin(), elements.end(), element), elements.end());
+    }
 }

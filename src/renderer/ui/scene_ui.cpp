@@ -5,6 +5,7 @@
 #include "scene_ui.h"
 
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <ranges>
 
 #include "renderer/scene/sdf_sphere.h"
@@ -120,13 +121,43 @@ void SceneUI::drawShapeDetails()
 
 void SceneUI::drawControls()
 {
+    //Don't allow any more additions
+    auto disabled = ctxScene->maxShapesLimitReached();
+    if (disabled)
+    {
+        ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
+    }
+
     ImGui::SetNextItemOpen(true, ImGuiCond_Always);
     if (ImGui::CollapsingHeader("Add Shapes"))
     {
-        if (ImGui::Button("Add Sphere")) { ctxScene->addShape(SDFShapeType::Sphere); }
+        if (ImGui::Button("Add Sphere")) {
+            ctxScene->addShape(SDFShapeType::Sphere);
+            setSelectedToLast();
+        }
         ImGui::SameLine();
-        if (ImGui::Button("Add Box")) { ctxScene->addShape(SDFShapeType::Box); }
+        if (ImGui::Button("Add Box"))
+        {
+            ctxScene->addShape(SDFShapeType::Box);
+            setSelectedToLast();
+        }
         ImGui::SameLine();
-        if (ImGui::Button("Add Cylinder")) { ctxScene->addShape(SDFShapeType::Cylinder); }
+        if (ImGui::Button("Add Cylinder"))
+        {
+            ctxScene->addShape(SDFShapeType::Cylinder);
+            setSelectedToLast();
+        }
     }
+
+    if (disabled)
+    {
+        ImGui::PopItemFlag();
+        ImGui::PopStyleVar();
+    }
+}
+
+void SceneUI::setSelectedToLast()
+{
+    selected = ctxScene->getElements().at(ctxScene->getElements().size()-1);
 }

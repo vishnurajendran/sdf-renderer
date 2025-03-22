@@ -32,7 +32,7 @@ struct SDFShapeDataStruct {
 };
 
 layout(std140) uniform ShapeBlock {
-    SDFShapeDataStruct shapes[10];
+    SDFShapeDataStruct shapes[30];
 };
 
 uniform int shapeCount;

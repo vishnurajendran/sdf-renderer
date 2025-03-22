@@ -9,7 +9,8 @@
 
 class Scene
 {
-    const int MAX_SCENE_OBJECTS = 10;
+    //Limit the shapes for performance
+    const int MAX_SCENE_OBJECTS = 30;
 private:
     std::vector<SceneElement*> elements;
     Camera* cameraRef;
@@ -17,14 +18,18 @@ private:
 
     unsigned int bufferIndex;
     unsigned int sceneBufferObject;
+    unsigned int shapesInScene;
+
 public:
     Scene();
     inline Camera* getCamera() { return cameraRef; }
     inline std::vector<SceneElement*> getElements() { return elements; }
+    [[nodiscard]] bool maxShapesLimitReached() const {return shapesInScene >= MAX_SCENE_OBJECTS;}
+
     void pushToShader(unsigned int shaderId);
     void update(double deltaTime);
     void addShape(SDFShapeType shapeType);
-    void removeSceneElement(const SceneElement* element);
+    void removeSceneElement(SceneElement* element);
 private:
     void initBuffer(unsigned int shaderId);
 };

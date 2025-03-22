@@ -32,7 +32,9 @@ void SDFBox::updateDataToShader(unsigned int shaderId)
 void SDFBox::drawInspectorGui()
 {
     SDFShape::drawInspectorGui();
-    ImGui::Text("Half Extents");
-    ImGui::SameLine();
-    ImGui::InputFloat3("##HALF_EXT", glm::value_ptr(shaderDataStruct.halfExtents));
+    if (ImGui::CollapsingHeader("Box Properties")){
+        ImGui::Text("Half Extents");
+        ImGui::SameLine();
+        ImGui::InputFloat3("##HALF_EXT", glm::value_ptr(shaderDataStruct.halfExtents));
+    }
 }

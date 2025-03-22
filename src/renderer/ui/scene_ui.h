@@ -19,6 +19,7 @@ private:
     void drawSelector();
     void drawShapeDetails();
     void drawControls();
+    void setSelectedToLast();
 };
 
 #endif //UI_LAYER_H

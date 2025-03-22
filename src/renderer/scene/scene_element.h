@@ -17,8 +17,8 @@ public:
     virtual void updateDataToShader(unsigned int shaderId)=0;
     virtual void update(double deltaTime);
 public:
-    alignas(16) glm::vec3 position;
-    alignas(16) glm::vec3 rotation;
+    alignas(16) glm::vec3 position = glm::vec3(0);
+    alignas(16) glm::vec3 rotation = glm::vec3(0);
     glm::vec3 forward;
     glm::vec3 up;
     glm::vec3 right;

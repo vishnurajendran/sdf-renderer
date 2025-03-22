@@ -27,6 +27,7 @@ protected:
     SDFShaderDataStruct shaderDataStruct;
     virtual SDFShapeType getType()=0;
 public:
+    SDFShape();
     SDFShaderDataStruct getDataStruct();
     void updateDataToShader(unsigned int shaderId) override;
     void update(double deltaTime) override;

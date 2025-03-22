@@ -33,10 +33,12 @@ void SDFCylinder::updateDataToShader(unsigned int shaderId)
 void SDFCylinder::drawInspectorGui()
 {
     SDFShape::drawInspectorGui();
-    ImGui::Text("Radius");
-    ImGui::SameLine();
-    ImGui::InputFloat("##CYL_RAD", &shaderDataStruct.radius);
-    ImGui::Text("Height");
-    ImGui::SameLine();
-    ImGui::InputFloat("##CYL_HEIGHT", &shaderDataStruct.halfExtents.y);
+    if (ImGui::CollapsingHeader("Cylinder Properties")){
+        ImGui::Text("Radius");
+        ImGui::SameLine();
+        ImGui::InputFloat("##CYL_RAD", &shaderDataStruct.radius);
+        ImGui::Text("Height");
+        ImGui::SameLine();
+        ImGui::InputFloat("##CYL_HEIGHT", &shaderDataStruct.halfExtents.y);
+    }
 }
