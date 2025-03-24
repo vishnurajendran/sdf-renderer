@@ -5,6 +5,7 @@
 #include "scene.h"
 
 #include <iostream>
+#include <algorithm>
 
 #include "sdf_shape.h"
 #include "sdf_sphere.h"
